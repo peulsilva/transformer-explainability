@@ -51,9 +51,7 @@ class AttentionRollout:
         self.head_fusion = head_fusion
         self.discard_ratio = discard_ratio
         self.attention_layer_name = attention_layer_name
-        for name, module in self.model.named_modules():
-            if name.endswith(attention_layer_name):
-                module.register_forward_hook(self.get_attention)
+        
 
         self.attentions = []
         self.is_vit = is_vit
@@ -71,12 +69,20 @@ class AttentionRollout:
         self.attentions.append(attention_heads_fused.cpu())
 
     def __call__(self, input_tensor = None, **kwargs):
+
+        for name, module in self.model.named_modules():
+            if name.endswith(self.attention_layer_name):
+                module.register_forward_hook(self.get_attention)
         self.attentions = []
 
         with torch.no_grad():
             output = self.model(**kwargs)
 
-        return output, rollout(self.attentions, self.discard_ratio, self.is_vit)
+        attn_matrix = rollout(self.attentions, self.discard_ratio, self.is_vit)
+
+        self.remove_hooks()
+
+        return output, attn_matrix
     
     def remove_hooks(self):
         """
