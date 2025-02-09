@@ -76,7 +76,7 @@ class AttentionRollout:
         self.attentions = []
 
         with torch.no_grad():
-            output = self.model(**kwargs)
+            output = self.model(**kwargs, output_attentions = True)
 
         attn_matrix = rollout(self.attentions, self.discard_ratio, self.is_vit)
 
