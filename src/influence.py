@@ -4,12 +4,14 @@ import matplotlib.pyplot as plt
 from transformers import AutoModel, AutoTokenizer
 
 class Influence:
-    def __init__(self, model, discard_ratio = 0.9, is_vit : bool = False):
+    def __init__(self, model, discard_ratio = 0.9, is_vit : bool = False, return_mask : bool = True, head_fusion = 'mean'):
         self.model = model
         self.model.eval()
         self.device = self.model.device
         self.discard_ratio = discard_ratio
         self.is_vit = is_vit
+        self.return_mask = return_mask
+        self.head_fusion = head_fusion
 
     def convert_to_cpu(self, list):
         new_list = []
@@ -62,7 +64,10 @@ class Influence:
         influence_scores = torch.eye(seq_len)  # Identity matrix: each token initially influences itself
         
         for layer in range(num_layers):  
-            attention_matrix = attentions[layer].mean(dim=1)[0]  # Average over heads, shape: (seq_len, seq_len)
+            if self.head_fusion == 'mean':
+                attention_matrix = attentions[layer].max(dim=1)[0]
+            if self.head_fusion == 'max':
+                attention_matrix = attentions[layer].max(dim=1)[0]  # Average over heads, shape: (seq_len, seq_len)
             attention_matrix = self.apply_discard_ratio(attention_matrix,)
             r_k = norm_hidden_states[layer][0] / ((attention_matrix @ hidden_states[layer]).norm(dim=-1) + 1e-6)
 
@@ -78,7 +83,7 @@ class Influence:
         influence_matrix = influence_scores.cpu()
         influence_matrix /= (influence_matrix.sum(axis=-1, keepdims=True) + 1e-6)
 
-        if self.is_vit:
+        if self.is_vit and self.return_mask:
             mask = influence_matrix[0, 0, 1:].numpy()
             width = 14
             mask = mask.reshape(width, width)

@@ -73,10 +73,10 @@ class AttentionGradRollout:
 
         category_index = kwargs['labels']
         self.model.zero_grad()
-        output = self.model(**kwargs)
+        output = self.model(**kwargs, output_attentions = True)
         # loss = output.loss
         # loss.backward()
-        category_mask = torch.zeros(output.logits.size(), device = output.logits.device)
+        category_mask = torch.zeros(output.logits.size(), device = output.logits.device, )
         category_mask[:, category_index] = 1
         loss = (output.logits*category_mask).sum()
         loss.backward()
