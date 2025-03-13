@@ -88,6 +88,7 @@ pip install -r requirements.txt
 ### **AG News Task**  
 | Metric            | Positive perturbation AUC (Lower = Better) | Negative perturbation AUC (Higher = Better) |
 | ----------------- | ------------------------------------------ | ------------------------------------------- |
+| Raw Attention     | 0.78                                       | 0.64                                        |
 | Attention Rollout | 0.60                                       | 0.79                                        |
 | Influence         | 0.57                                       | 0.80                                        |
 | Gradient Rollout  | 0.56                                       | 0.81                                        |
@@ -95,9 +96,10 @@ pip install -r requirements.txt
 ### **ImageNet Task**  
 | Metric            | Positive perturbation AUC (Lower = Better) | Negative perturbation AUC (Higher = Better) |
 | ----------------- | ------------------------------------------ | ------------------------------------------- |
-| Attention Rollout | 0.43                                       | 0.70                                        |
-| Influence         | 0.40                                       | 0.72                                        |
-| Gradient Rollout  | 0.36                                       | 0.73                                        |
+| Raw Attention     | 0.69                                       | 0.67                                        |
+| Attention Rollout | 0.68                                       | 0.68                                        |
+| Influence         | 0.66                                       | 0.72                                        |
+| Gradient Rollout  | 0.65                                       | 0.72                                        |
 
 Gradient-based methods showed superior performance in identifying important tokens. Influence remains a computationally efficient alternative for large-scale models.  
 
